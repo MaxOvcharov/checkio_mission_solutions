@@ -23,21 +23,20 @@ text содержит только ASCII символы.
 import string
 
 
-# def checkio(text):
-#     a = list(text.lower())
-#     a.sort()
-#     count = [0, 0]
-#     for i in a:
-#         if i.isalpha():
-#             temp = a.count(i)
-#             if temp > count[0]:
-#                 count[0] = temp
-#                 count[1] = i
-#     return count[1]
-
-
-# def checkio_best_solution(text):
 def checkio(text):
+    a = list(text.lower())
+    a.sort()
+    count = [0, 0]
+    for i in a:
+        if i.isalpha():
+            temp = a.count(i)
+            if temp > count[0]:
+                count[0] = temp
+                count[1] = i
+    return count[1]
+
+
+def checkio_best_solution(text):
     """
     We iterate through latyn alphabet and count each letter in the text.
     Then 'max' selects the most frequent letter.
