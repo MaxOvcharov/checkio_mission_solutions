@@ -9,6 +9,7 @@ same letters "aaa", "bb","c" and "aaaa".
 The last substring is the longest one which makes it an answer.
 
 *********************** TASK *******************************
+
 Input: String.
 
 Output: Int.
