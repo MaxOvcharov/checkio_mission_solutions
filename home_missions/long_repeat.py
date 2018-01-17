@@ -1,3 +1,4 @@
+# coding: utf-8
 """
 This mission is the first one of the series.
 
