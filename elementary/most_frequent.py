@@ -10,16 +10,15 @@ Output: a string.
 """
 
 
-# My solution faster
 def most_frequent_my(data):
     """
         determines the most frequently occurring string in the sequence.
     """
     # your code here
-    return max(data.count(n) for n in data)
+    return max((data.count(n), n) for n in data)[1]
 
 
-def most_frequent(data):
+def most_frequent_best_solution(data):
     """
         determines the most frequently occurring string in the sequence.
     """
