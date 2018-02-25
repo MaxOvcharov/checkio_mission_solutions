@@ -10,9 +10,18 @@ Output: Строка, рыночный код
 """
 
 
+def best_stock_my(data):
+    return max(data, key=lambda n: data[n])
+
+
+# faster than my solution
 def best_stock(data):
-    # your code here
-    return 'GOOG'
+    data_value, data_stock = 0, 0
+    for stock, value in data.items():
+        if value > data_value:
+            data_value, data_stock = value, stock
+
+    return data_stock
 
 
 if __name__ == '__main__':
