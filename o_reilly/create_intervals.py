@@ -30,7 +30,7 @@ def create_intervals(data):
     """
 
     cur, priv, res, tmp = 0, 0, [], []
-    for cur in data:
+    for cur in sorted(data):
         if priv != 0 and cur - priv == 1:
             priv = cur
             tmp.append(cur)
@@ -46,8 +46,7 @@ def create_intervals(data):
             tmp.append(cur)
 
     res.append(tmp)
-    a = [(i[0], i[-1]) for i in res if i]
-    return a
+    return [(i[0], i[-1]) for i in res if i]
 
 
 if __name__ == '__main__':
