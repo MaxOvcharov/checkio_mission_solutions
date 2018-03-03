@@ -24,7 +24,7 @@ Output: список кортежей двух целых чисел(A list of t
 """
 
 
-def create_intervals(data):
+def create_intervals_my(data):
     """
         Create a list of intervals out of set of ints.
     """
@@ -47,6 +47,20 @@ def create_intervals(data):
 
     res.append(tmp)
     return [(i[0], i[-1]) for i in res if i]
+
+
+# best solution
+def create_intervals(data):
+    c = []
+    while len(data) != 0:
+        a = min(data)
+        data = data-{a}
+        b = a+1
+        while b in data:
+            data = data-{b}
+            b += 1
+        c.append((a, b-1))
+    return c
 
 
 if __name__ == '__main__':
