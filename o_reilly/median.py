@@ -63,12 +63,19 @@ def partition(alist, first, last):
     return rightmark
 
 
-def checkio(data):
+def checkio_my(data):
     data.sort()
     if len(data) % 2 == 0:
-        return ((data[len(data) // 2] + data[(len(data) // 2) - 1]) / 2.0)
+        return (data[len(data) // 2] + data[(len(data) // 2) - 1]) / 2.0
     else:
         return data[len(data)//2]
+
+
+# best solution
+def checkio(data):
+    data.sort()
+    half = len(data) // 2
+    return (data[half] + data[~half]) / 2
 
 
 #  These "asserts" using only for self-checking and not necessary for auto-testing
