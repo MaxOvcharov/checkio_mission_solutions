@@ -34,37 +34,57 @@ Output: Связаны ли указанные дроны между собой,
 """
 
 
-def check_connection(network, first, second):
+def check_connection_my(network, first, second):
     friend_groups, fiends = [], {first, second}
 
     for friends in network:
         f1, f2 = friends.split("-")
         new_group, input_index = False, None
-        for i, friend_group in enumerate(friend_groups):
+        for friend_group in friend_groups:
             if f1 in friend_group and f2 not in friend_group:
-                if input_index is not None:
-                    friend_groups[input_index].add(f2)
-                    input_index = None
-                else:
-                    friend_group.add(f2)
-                    input_index = i
-
+                friend_group.add(f2)
                 new_group = False
             elif f1 not in friend_group and f2 in friend_group:
-                if input_index is not None:
-                    friend_groups[input_index].add(f1)
-                    input_index = None
-                else:
-                    friend_group.add(f1)
-                    input_index = i
-
+                friend_group.add(f1)
                 new_group = False
             elif f1 not in friend_group and f2 not in friend_group:
                 new_group = True
 
         if new_group or not friend_groups:
             friend_groups.append({f1, f2})
-    return any(friend_group.issuperset(fiends) for friend_group in friend_groups)
+
+    res, priv_union = [], False
+    for i, node in enumerate(friend_groups):
+        try:
+            if not node.isdisjoint(friend_groups[i+1]):
+                if not priv_union:
+                    res.append(node | friend_groups[i+1])
+                    priv_union = True
+                elif priv_union and res:
+                    res[-1] = res[-1] | node
+            else:
+                res.append(node)
+                priv_union = False
+        except IndexError:
+            if res and not node.isdisjoint(res[-1]):
+                res[-1] = res[-1] | node
+            else:
+                res.append(node)
+
+    return any(friend_group.issuperset(fiends) for friend_group in res)
+
+
+# best solution
+def check_connection(network, first, second):
+    subnet, todo = {first}, {frozenset(pair.split('-')) for pair in network}
+    while True:
+        for pair in todo:
+            if subnet & pair:
+                subnet |= pair
+                todo.remove(pair)
+                break
+        else:
+            return second in subnet
 
 
 if __name__ == '__main__':
@@ -82,6 +102,6 @@ if __name__ == '__main__':
          "scout3-scout1", "scout1-scout4", "scout4-sscout", "sscout-super"),
         "dr101", "sscout") == False, "I don't know any scouts."
 
-    # assert check_connection(
-    #     ("nikola-robin", "batman-nwing", "mr99-batman", "mr99-robin",
-    #      "dr101-out00", "out00-nwing",), "dr101", "mr99") == True
+    assert check_connection(
+        ("nikola-robin", "batman-nwing", "mr99-batman", "mr99-robin",
+         "dr101-out00", "out00-nwing",), "dr101", "mr99") == True
