@@ -22,14 +22,20 @@ re.match("[a-zA-Z0-9]+", password)
 """
 
 
-def checkio(pas):
+def checkio_my(pas):
     if len(pas) < 10:
         return False
-    numbers = sum(c.isdigit() for c in pas)
-    upper_str = sum(c.isupper() for c in pas)
-    lower_str = sum(c.islower() for c in pas)
-    return True if (upper_str > 0) and (lower_str > 0) and (numbers > 0) else False
 
+    return not (pas.isdigit() or pas.isupper() or pas.islower() or pas.isalpha())
+
+
+checkio = lambda s: not(
+        len(s) < 10
+        or s.isdigit()
+        or s.isalpha()
+        or s.islower()
+        or s.isupper()
+    )
 
 if __name__ == '__main__':
     #  These "asserts" using only for self-checking and not necessary for auto-testing
