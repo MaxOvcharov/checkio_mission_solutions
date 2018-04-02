@@ -43,15 +43,24 @@ def count_gold(pyramid):
     swap_pyramid = reversed(pyramid)
     max_res = []
     for i, row in enumerate(swap_pyramid):
-        priv = cur = 0
+        max_obj = cur = 0
         tmp_max_obj = []
         for j, obj in enumerate(row):
             if max_res:
                 pass
             else:
                 cur = obj
-                if priv > 0:
-                    priv = cur
+                if max_obj != 0:
+                    if cur > max_obj:
+                        max_obj = cur
+                        tmp_max_obj = [[max_obj, j]]
+                    elif cur == max_obj:
+                        tmp_max_obj.append([cur, j])
+                else:
+                    max_obj = cur
+                    tmp_max_obj.append([cur, j])
+
+        max_res.append([i for i in tmp_max_obj])
 
     return sum(max_res)
 
