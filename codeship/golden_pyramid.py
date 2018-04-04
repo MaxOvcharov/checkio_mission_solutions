@@ -36,33 +36,42 @@ all(all(0 < x < 10 for x in row) for row in pyramid)
 """
 
 
-def count_gold(pyramid):
+def get_cost(costs, i, j):
+    """ returns 0 if you get out of pyramid """
+    if j < 0 or i < 0:
+        return 0
+    try:
+        return costs[i][j]
+    except IndexError:
+        return 0
+
+
+def count_gold_my(pyramid):
     """
     Return max possible sum in a path from top to bottom
     """
-    swap_pyramid = reversed(pyramid)
-    max_res = []
-    for i, row in enumerate(swap_pyramid):
-        max_obj = cur = 0
-        tmp_max_obj = []
-        for j, obj in enumerate(row):
-            if max_res:
-                pass
+
+    costs = []  # max costs of i,j-position
+    for i in range(0, len(pyramid)):
+        costs.append([])
+        for j in range(0, len(pyramid[i])):
+            if i == j == 0:
+                costs[i].append(pyramid[i][j])
             else:
-                cur = obj
-                if max_obj != 0:
-                    if cur > max_obj:
-                        max_obj = cur
-                        tmp_max_obj = [[max_obj, j]]
-                    elif cur == max_obj:
-                        tmp_max_obj.append([cur, j])
-                else:
-                    max_obj = cur
-                    tmp_max_obj.append([cur, j])
+                cij = pyramid[i][j] + max(get_cost(costs, i - 1, j - 1), get_cost(costs, i - 1, j))
+                costs[i].append(cij)
 
-        max_res.append([i for i in tmp_max_obj])
+    return max(costs[-1])
 
-    return sum(max_res)
+
+# best solution
+def count_gold(pyramid):
+    pyramid_list = [list(row) for row in pyramid]
+    for i in range(len(pyramid_list) - 2, -1, -1):
+        for j in range(i + 1):
+            pyramid_list[i][j] += max(pyramid_list[i + 1][j], pyramid_list[i + 1][j + 1])
+
+    return pyramid_list[0][0]
 
 
 if __name__ == '__main__':
