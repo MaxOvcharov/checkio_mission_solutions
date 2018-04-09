@@ -39,32 +39,49 @@ import re
 # approximate radius of earth in km
 R = 6373.0
 
-lat1 = radians(52.2296756)
-lon1 = radians(21.0122287)
-lat2 = radians(52.406374)
-lon2 = radians(16.9251681)
-
-dlon = lon2 - lon1
-dlat = lat2 - lat1
-
-a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
-c = 2 * atan2(sqrt(a), sqrt(1 - a))
-
-distance = R * c
+# lat1 = radians(52.2296756)
+# lon1 = radians(21.0122287)
+# lat2 = radians(52.406374)
+# lon2 = radians(16.9251681)
+#
+# dlon = lon2 - lon1
+# dlat = lat2 - lat1
+#
+# a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+# c = 2 * atan2(sqrt(a), sqrt(1 - a))
+#
+# distance = R * c
 
 PAT = re.compile(r'([0-9]{1,2})°([0-9]{1,2})′([0-9]{1,2})″([EWSN])')
 
 
 def convert_to_radians(coordinates):
     lat, lon = coordinates
+    lat = [int(i) for i in lat if i not in 'WESN']
+    lon = [int(i) for i in lon if i not in 'WESN']
+    lat_tmp = lat[0] + (lat[1] + 60/lat[2])/60
+    lon_tmp = lon[0] + (lon[1] + 60/lon[2])/60
+
+    lat = lat_tmp if lat[3] in ('N', 'E') else -1 * lat_tmp
+    lon = lon_tmp if lon[3] in ('N', 'E') else -1 * lon_tmp
+
+    return radians(lat), radians(lon)
 
 
 def distance(first, second):
-    res1 = PAT.findall(first)
+    first = PAT.findall(first)
+    second = PAT.findall(second)
+    lat1, lon1 = convert_to_radians(first)
+    lat2, lon2 = convert_to_radians(second)
 
-    res2 = PAT.findall(second)
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
 
-    return 1
+    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    distance = R * c
+
+    return distance
 
 
 if __name__ == '__main__':
