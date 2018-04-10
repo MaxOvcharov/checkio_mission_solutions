@@ -33,24 +33,11 @@ Input: Two arguments. Coordinates as strings (unicode).
 
 Output: The distance as a number (int or float).
 """
-from math import sin, cos, sqrt, atan2, radians
+from math import sin, cos, sqrt, atan2, radians, pi, acos
 import re
 
 # approximate radius of earth in km
-R = 6373.0
-
-# lat1 = radians(52.2296756)
-# lon1 = radians(21.0122287)
-# lat2 = radians(52.406374)
-# lon2 = radians(16.9251681)
-#
-# dlon = lon2 - lon1
-# dlat = lat2 - lat1
-#
-# a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
-# c = 2 * atan2(sqrt(a), sqrt(1 - a))
-#
-# distance = R * c
+R = 6371
 
 PAT = re.compile(r'([0-9]{1,2})°([0-9]{1,2})′([0-9]{1,2})″([EWSN])')
 
@@ -59,34 +46,58 @@ def convert_to_radians(coordinates):
     lat, lon = coordinates
     lat = [int(i) for i in lat if i not in 'WESN']
     lon = [int(i) for i in lon if i not in 'WESN']
-    lat_tmp = lat[0] + (lat[1] + 60/lat[2])/60
-    lon_tmp = lon[0] + (lon[1] + 60/lon[2])/60
+    lat_tmp = (lat[0] * 3600 + lat[1] * 60 + lat[2]) / 3600.0
+    lon_tmp = (lon[0] * 3600 + lon[1] * 60 + lon[2]) / 3600.0
 
-    lat = lat_tmp if lat[3] in ('N', 'E') else -1 * lat_tmp
-    lon = lon_tmp if lon[3] in ('N', 'E') else -1 * lon_tmp
-
+    lat = lat_tmp if lat[2] in ('N', 'E') else -1 * lat_tmp
+    lon = lon_tmp if lon[2] in ('N', 'E') else -1 * lon_tmp
+    print(lat, lon)
     return radians(lat), radians(lon)
 
 
-def distance(first, second):
+def distance_my(first, second):
     first = PAT.findall(first)
     second = PAT.findall(second)
     lat1, lon1 = convert_to_radians(first)
     lat2, lon2 = convert_to_radians(second)
+    direct_distance = sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(lon1 - lon2)
+    # return round(R * acos(direct_distance), 1) if acos(direct_distance) != 0 else pi * R
+    if acos(direct_distance) == 0:
+        return pi * R
+    return round(R * acos(direct_distance), 1)
 
-    dlon = lon2 - lon1
-    dlat = lat2 - lat1
 
-    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
-    c = 2 * atan2(sqrt(a), sqrt(1 - a))
-    distance = R * c
+def extract_position(position_str):
+    items = re.search('(\d+)\D(\d+)\D(\d+)\D(\w)', position_str).groups()
+    if 'W' in position_str or 'S' in position_str:
+        return radians(-(int(items[0]) * 3600
+                         + int(items[1]) * 60 + int(items[2])) / 3600.0)
+    return radians((int(items[0]) * 3600 + int(items[1]) * 60
+                    + int(items[2])) / 3600.0)
 
-    return distance
+
+def distance(first, second):
+    if len(first.split()) == 2:
+        first = first.split()
+    else:
+        first = first.split(',')
+    if len(second.split()) == 2:
+        second = second.split()
+    else:
+        second = second.split(',')
+    first_latitude, first_longitude, second_latitude, second_longitude = map(
+        extract_position, first + second)
+    direct_distance = sin(first_latitude) * sin(second_latitude) + cos(first_latitude) * cos(second_latitude) * cos(
+        first_longitude - second_longitude)
+    if acos(direct_distance) == 0:
+        return pi * R
+    return round(R * acos(direct_distance), 1)
 
 
 if __name__ == '__main__':
     #  These "asserts" using only for self-checking and not necessary for auto-testing
     def almost_equal(checked, correct, significant_digits=1):
+        print(checked)
         precision = 0.1 ** significant_digits
         return correct - precision < checked < correct + precision
 
